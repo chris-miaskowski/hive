@@ -1,17 +1,16 @@
 define(function() {	
 
-	function Field() {
+	function FieldModel() {
 		this.neighbours = new Array(6);
 	}
 
-	Field.prototype.pawn = null;
+	FieldModel.prototype.pawn = null;
 
-	Field.prototype.neighbours = null;
+	FieldModel.prototype.neighbours = null;
 
-	Field.prototype.placePawn = function(pawn) {
+	FieldModel.prototype.placePawn = function(pawn) {
 		var neighbours = this.neighbours,
 			neighboursNumber = neighbours.length,
-			neighbourIndex,
 			neighbour,
 			masterIndex,
 			prevSiblingIndex,
@@ -22,14 +21,13 @@ define(function() {
 
 		for(i = 0; i < neighboursNumber; i++) {
 			if(neighbours[i]) continue;
-			neighbours[i] = new Field();
+			neighbours[i] = new FieldModel();
 		}
 
 
 		for(i = 0; i < neighboursNumber; i++) {
-			neighbourIndex = neighbours[i];
-			neighbour = neighbours[neighbourIndex];
-			masterIndex = mirrorIndex(index);
+			neighbour = neighbours[i];
+			masterIndex = mirrorIndex(i);
 			prevSiblingIndex = prevIndex(masterIndex);
 			nextSiblingIndex = nextIndex(masterIndex);
 
@@ -42,7 +40,7 @@ define(function() {
 		}
 	};
 
-	Field.prototype.takePawnOff = function() {
+	FieldModel.prototype.takePawnOff = function() {
 		this.pawn = null;
 		
 		this.neighbours
@@ -57,7 +55,7 @@ define(function() {
 			}.bind(this));
 	};
 
-	Field.prototype.hasOnlyEmptyNeighbours = function() {
+	FieldModel.prototype.hasOnlyEmptyNeighbours = function() {
 		return this.neighbours.filter(function(n) { return n && n.pawn; }).length == 0;
 	};
 
@@ -73,6 +71,6 @@ define(function() {
 		return (index + 5) % 6;
 	}
 
-	return Field;
+	return FieldModel;
 
 });
