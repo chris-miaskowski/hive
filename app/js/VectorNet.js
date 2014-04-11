@@ -15,6 +15,20 @@ define(function() {
 		return this._findNodeByVector(this._getVectorForFieldAndDirection(field, direction));
 	}
 
+	VectorNet.prototype.removeByField = function(field) {
+		var index;
+		for(var i = 0; i < this._vectorNet.length; i++) {
+			if(this._vectorNet[i].field == field) {
+				index = i;
+				break;
+			}
+		}
+
+		if(index !== undefined) {
+			this._vectorNet.splice(index, 1);
+		}
+	}
+
 	VectorNet.prototype._getVectorForIndex = function(index) {
 		if(index == 0) { return [1,1]; }
 		if(index == 1) { return [2,0]; }

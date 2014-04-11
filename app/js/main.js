@@ -21,7 +21,7 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 	        radius: 40,
 	        stroke: 'black',
 	        strokeWidth: 1,
-	        dash: [8, 5]
+	        dash: [8, 5],
 	      });
 	}
 
@@ -58,26 +58,70 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 		height: 500
 	});
 
-	var layer = new Kinetic.Layer();
+	var boardlayer = new Kinetic.Layer();
 
 	var hexagon = getHexagon(stage.getWidth()/2, 
 		stage.getHeight()/2);	
+
+	function getFieldByModel(model) {
+		return boardStructure.filter(function(field) {
+			return field.model == model;
+		})[0];
+	}
+
+	function getFieldsByModels(models) {
+		return models.map(getFieldByModel);
+	}
 
 	function createField(hexagon, fieldModel) {
 		console.log('creating new field');
 		var field = {
 			model: fieldModel,
 			view: hexagon
-		};
-		hexagon.on('click', handleHexagonClicked.bind(null, field));
+		};		
+		field.x = hexagon.getX();
+		field.y = hexagon.getY();
+		attachHandlers(field);
 		boardStructure.push(field);
 		return field;
+	}
+
+	function attachHandlers(field) {
+		var hexagon = field.view;
+		hexagon.on('click', handleHexagonClicked.bind(null, field));
+		hexagon.on('dragstart', handleHexagonDragStart.bind(null, field));
+		hexagon.on('dragend', handleHexagonDragEnd.bind(null, field));
 	}
 
 	function boardContainsFieldModel(fieldModel) {
 		return boardStructure.filter(function(field) {
 			return field.model == fieldModel;
 		}).length > 0;
+	}
+
+	var draggedHexagon;
+
+	function handleHexagonDragStart(field) {		
+		var emptyHexagon = getHexagon(field.x, field.y),
+			removedFields = getFieldsByModels(field.model.takePawnOff());
+
+		draggedHexagon = field.view;		
+		field.view = emptyHexagon;		
+		attachHandlers(field);
+
+		removedFields.forEach(function(rfield) {
+			rfield.view.remove();
+		});		
+
+		boardlayer.add(emptyHexagon);
+		boardlayer.draw();
+		draggedHexagon.moveToTop();
+	}
+
+	function handleHexagonDragEnd(field) {
+		draggedHexagon.remove();
+		draggedHexagon = null;
+		boardlayer.draw();
 	}
 
 	function handleHexagonClicked(field) {	
@@ -90,6 +134,7 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 
 			model.placePawn("pawn");
 			hexagon.fill('green');
+			hexagon.draggable(true);
 			hexagon.dash([]);	
 			console.log("placing pawn");
 
@@ -100,17 +145,17 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 						createHexagonNextToForIndex(hexagon, i),
 						neighbour
 					);
-					layer.add(newField.view);
+					boardlayer.add(newField.view);
 				}
 			}
 		}				
 		
-		layer.draw();
+		boardlayer.draw();
 	}	
 
 	createField(hexagon, fieldModel);
 
-	layer.add(hexagon);
-	stage.add(layer);
+	boardlayer.add(hexagon);
+	stage.add(boardlayer);
 
 });

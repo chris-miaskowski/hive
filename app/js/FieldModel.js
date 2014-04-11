@@ -35,6 +35,44 @@ define(['VectorNet'], function(VectorNet) {
 		}
 
 		neighbours.forEach(makeConnections);
+	};	
+
+	FieldModel.prototype.takePawnOff = function() {
+		var neighbour,
+			neighbours = this.neighbours,
+			removed = [];
+
+		function clearReferencesToField(field) {
+			var neighbours = field.neighbours,
+				neighbour;
+
+			// loop through removed field neighbours and clear references
+			for(var i = 0; i < neighbours.length; i++) {
+				neighbour = neighbours[i];
+				if(neighbour) {
+					delete neighbour.neighbours[mirrorIndex(i)];
+				}
+			}
+		}
+
+		this.pawn = null;
+		
+		for(var i = 0; i < neighbours.length; i++) {
+			neighbour = neighbours[i];			
+
+			// only those neighbours that are empty and have only empty neighbours
+			if(neighbour && !neighbour.pawn && neighbour.hasOnlyEmptyNeighbours()) {
+				vectorNet.removeByField(neighbour);
+				removed.push(neighbour);
+				clearReferencesToField(neighbour);				
+			}			
+		}
+		
+		return removed;
+	};
+
+	FieldModel.prototype.hasOnlyEmptyNeighbours = function() {
+		return this.neighbours.filter(function(n) { return n && n.pawn; }).length == 0;
 	};
 
 	function makeConnections(field) {
@@ -54,25 +92,6 @@ define(['VectorNet'], function(VectorNet) {
 		}
 
 	}
-
-	FieldModel.prototype.takePawnOff = function() {
-		this.pawn = null;
-		
-		this.neighbours
-			.filter(function(n) { 
-				// get only fields to remove - without pawn and with only empty neighbours
-				return n && !n.pawn && n.hasOnlyEmptyNeighbours();
-			})
-			.forEach(function(n) {
-				var i = this.neighbours.indexOf(n);
-				n.neighbours = null;		
-				delete this.neighbours[i];
-			}.bind(this));
-	};
-
-	FieldModel.prototype.hasOnlyEmptyNeighbours = function() {
-		return this.neighbours.filter(function(n) { return n && n.pawn; }).length == 0;
-	};
 
 	function mirrorIndex(index) {
 		return (index + 3) % 6;
