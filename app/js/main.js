@@ -63,6 +63,12 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 	var hexagon = getHexagon(stage.getWidth()/2, 
 		stage.getHeight()/2);	
 
+	function getFieldByView(view) {
+		return boardStructure.filter(function(field) {
+			return field.view == view;
+		})[0];
+	}
+
 	function getFieldByModel(model) {
 		return boardStructure.filter(function(field) {
 			return field.model == model;
@@ -118,10 +124,18 @@ require(["kineticjs", "FieldModel"], function(Kinetic, FieldModel) {
 		draggedHexagon.moveToTop();
 	}
 
-	function handleHexagonDragEnd(field) {
-		draggedHexagon.remove();
+	function handleHexagonDragEnd(field, mouseEvent) {		
+		draggedHexagon.remove();		
 		draggedHexagon = null;
 		boardlayer.draw();
+
+		var dropTarget = getFieldByView(stage.getIntersection(stage.pointerPos));
+		if(dropTarget) {
+			handleHexagonClicked(dropTarget);			
+		} else {
+			handleHexagonClicked(field)
+		}		
+		boardlayer.draw();		
 	}
 
 	function handleHexagonClicked(field) {	
