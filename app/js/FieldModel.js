@@ -1,7 +1,13 @@
-define(function() {	
+define(['VectorNet'], function(VectorNet) {		
+
+	var vectorNet;
 
 	function FieldModel() {
 		this.neighbours = new Array(6);
+		// net is empty, create root node
+		if(!vectorNet) {
+			vectorNet = new VectorNet(this);			
+		}
 	}
 
 	FieldModel.prototype.pawn = null;
@@ -17,28 +23,37 @@ define(function() {
 			nextSiblingIndex,
 			i;
 
-		this.pawn = pawn;
+		this.pawn = pawn;		
 
 		for(i = 0; i < neighboursNumber; i++) {
 			if(neighbours[i]) continue;
-			neighbours[i] = new FieldModel();
+			neighbour = new FieldModel();
+			vectorNet.addFieldNextTo(neighbour, this, i);				
+			neighbours[i] = neighbour;
+			// set pointer to 'parent'
+			neighbour.neighbours[mirrorIndex(i)] = this;
 		}
 
-
-		for(i = 0; i < neighboursNumber; i++) {
-			neighbour = neighbours[i];
-			masterIndex = mirrorIndex(i);
-			prevSiblingIndex = prevIndex(masterIndex);
-			nextSiblingIndex = nextIndex(masterIndex);
-
-			// set reverse master neighbour field
-			neighbour.neighbours[ masterIndex ] = this;
-			// set previous sibling, a bit of magic related to symmetrical nature of hexagon
-			neighbour.neighbours[ prevSiblingIndex ] = this.neighbours[ mirrorIndex(nextSiblingIndex) ];
-			// set next sibling
-			neighbour.neighbours[ nextSiblingIndex ] = this.neighbours[ mirrorIndex(prevSiblingIndex) ];
-		}
+		neighbours.forEach(makeConnections);
 	};
+
+	function makeConnections(field) {
+		var neighbours = field.neighbours,
+			neighbour,
+			node;
+
+		for(var j = 0; j < neighbours.length; j++) {
+			neighbour = neighbours[j];
+			if(!neighbour) {
+				node = vectorNet.findNodeNextTo(field, j);
+				if(node) {
+					neighbours[j] = node.field;
+					node.field.neighbours[mirrorIndex(j)] = field;
+				}
+			}
+		}
+
+	}
 
 	FieldModel.prototype.takePawnOff = function() {
 		this.pawn = null;
