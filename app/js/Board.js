@@ -71,37 +71,45 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		return this._fields.find(fn.dot('model').eq(model));
 	}
 
-	Board.prototype._getFieldsByModels = function(models) {
-		return models.map(this._getFieldByModel.bind(this));
-	}
-
 	Board.prototype.draggingStart = function(field) {		
-		var removedFields = this._getFieldsByModels(field.model.takePawnOff());
+		var removedFields = field.model.takePawnOff()
+				.map(this._getFieldByModel.bind(this));
 
 		this._draggedField = field;
+		// remove dragged field from the boards but leave it on screen
 		this._fields.remove(field);
+		// add new, empty, field in place of the dragged one
 		this._addField(new FieldView(field.x, field.y, this, field.model));
 
+		// remove all unnecessary fields left after taking pawn off
 		removedFields.forEach(function(rfield) {
 			rfield.remove();
-		});		
+			this._fields.remove(rfield);
+		}.bind(this));		
 		
 		this._draggedField.moveToTop();
 		this._layer.draw();		
 	}
 
-	Board.prototype.draggingEnd = function(field, mouseEvent) {
-		var draggedFieldReferer = this._getFieldByModel(this._draggedField.model);
+	Board.prototype.draggingEnd = function(field) {
+		var originalField = this._getFieldByModel(this._draggedField.model),
+			hexagon,
+			dropTargetField;
+
+		// remove dragged field from screen
 		this._draggedField.remove();
 		this._draggedField = null;
 		this._layer.draw();
-		var hexagon = this._stage.getIntersection(this._stage.pointerPos);
-		var dropTarget = this._fields.find(fn.dot('_hexagon').eq(hexagon));
-		if(dropTarget) {
-			this.putPawnOn(dropTarget);			
+
+		hexagon = this._stage.getIntersection(this._stage.pointerPos);
+		dropTargetField = this._fields.find(fn.dot('_hexagon').eq(hexagon));
+		
+		if(dropTargetField) {
+			this.putPawnOn(dropTargetField);			
 		} else {
-			this.putPawnOn(draggedFieldReferer);
+			this.putPawnOn(originalField);
 		}		
+
 		this._layer.draw();		
 	}
 
