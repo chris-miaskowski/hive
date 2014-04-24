@@ -16,8 +16,8 @@ require(["Board"], function(Board) {
 		playerB = { color: 'red' },			
 		players = [playerA, playerB];
 
-	playerA.pawn = { owner: playerA };
-	playerB.pawn = { owner: playerB };
+	playerA.pawn = { owner: playerA, type: 'A' };
+	playerB.pawn = { owner: playerB, type: 'A' };
 
 	var game = {
 		currentPlayer: players[0],

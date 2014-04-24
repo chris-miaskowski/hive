@@ -1,4 +1,4 @@
-define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
+define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, FieldView) {
 
 	function Board(game) {
 		this._game = game;
@@ -6,14 +6,15 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 		this._stage = new Kinetic.Stage({
 			container: 'boardContainer',
 			width: 800,
-			height: 800
+			height: 800,
+			draggable: true
 		});
 
 		this._layer = new Kinetic.Layer();
 
 		this._stage.add(this._layer);
 
-		this._structure = [];
+		this._fields = [];
 	}	
 
 	Board.prototype._game = null;
@@ -22,43 +23,34 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 
 	Board.prototype._layer = null;
 
-	Board.prototype._structure = null;
+	Board.prototype._fields = null;
 
-	Board.prototype._draggedHexagon = null;
+	Board.prototype._draggedField = null;
 
 	Board.prototype.init = function() {
-		this._createField(
-			this._createEmptyHexagon(
-				this._stage.getWidth()/2, 
-				this._stage.getHeight()/2), 
-			new FieldModel()
+		this._createField(			
+			new FieldView(this._stage.getWidth()/2, this._stage.getHeight()/2, this, new FieldModel())
 		);
 		this._layer.draw();
 	}
 
-	Board.prototype._createEmptyHexagon = function(x, y) {
-		return new Kinetic.RegularPolygon({
-	        x: x,
-	        y: y,
-	        sides: 6,
-	        fill: 'white',
-	        radius: 40,
-	        stroke: 'black',
-	        strokeWidth: 1,
-	        dash: [8, 5],
-	      });
+	Board.prototype._createField = function(fieldView) {
+		console.log('creating new field');	
+		this._fields.push(fieldView);
+		fieldView.addToLayer(this._layer);
+		return fieldView;
 	}
 
-	Board.prototype._createHexagonNextTo = function(hexagon, factX, factY) {
-		var R = hexagon.getRadius();
+	Board.prototype._coordsWithOffset = function(fieldView, factX, factY) {
+		var R = 40;
 		var sqrt3 = Math.sqrt(3);
-		return this._createEmptyHexagon(
-			hexagon.getX() + factX*R*sqrt3/2,
-			hexagon.getY() + factY*R*3/2
-		);
+		return [
+			fieldView.x + factX*R*sqrt3/2,
+			fieldView.y + factY*R*3/2
+		];
 	}
 
-	Board.prototype._createHexagonNextToForIndex = function(hexagon, index) {
+	Board.prototype._emptyFieldInNeighbourhood = function(fieldView, index) {
 		// Some math magic
 		function yFactor(i) {
 			return (Math.floor(3/(i+1)) >= 1)*(1 - i) + (Math.floor((i+1)/4) >= 1)*(i - 4);
@@ -70,17 +62,25 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 			return a*b;
 		}
 
-		return this._createHexagonNextTo(hexagon, xFactor(index), yFactor(index));
+		return this._coordsWithOffset(fieldView, xFactor(index), yFactor(index));
 	}
 
-	Board.prototype._getFieldByView = function(view) {
-		return this._structure.filter(function(field) {
-			return field.view == view;
+	Board.prototype._getFieldByView = function(fieldView) {
+		return this._fields[this._fields.indexOf(fieldView)];
+	}
+
+	Board.prototype._removeField = function(field) {
+		this._fields.splice(this._fields.indexOf(field), 1);
+	}
+
+	Board.prototype._getFieldByHexagon = function(hex) {
+		return this._fields.filter(function(field) {
+			return field._hexagon == hex;
 		})[0];
 	}
 
 	Board.prototype._getFieldByModel = function(model) {
-		return this._structure.filter(function(field) {
+		return this._fields.filter(function(field) {
 			return field.model == model;
 		})[0];
 	}
@@ -89,69 +89,46 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 		return models.map(this._getFieldByModel.bind(this));
 	}
 
-	Board.prototype._createField = function(hexagon, fieldModel) {
-		console.log('creating new field');
-		var field = {
-			model: fieldModel,
-			view: hexagon
-		};		
-		field.x = hexagon.getX();
-		field.y = hexagon.getY();
-		this._attachHandlers(field);
-		this._structure.push(field);
-		this._layer.add(hexagon);
-		return field;
-	}
-
-	Board.prototype._attachHandlers = function(field) {
-		var hexagon = field.view;
-		hexagon.on('click', this._handleHexagonClicked.bind(this, field));
-		hexagon.on('dragstart', this._handleHexagonDragStart.bind(this, field));
-		hexagon.on('dragend', this._handleHexagonDragEnd.bind(this, field));
-	}
-
 	Board.prototype._boardContainsFieldModel = function(fieldModel) {
-		return this._structure.filter(function(field) {
+		return this._fields.filter(function(field) {
 			return field.model == fieldModel;
 		}).length > 0;
 	}	
 
-	Board.prototype._handleHexagonDragStart = function(field) {		
-		var emptyHexagon = this._createEmptyHexagon(field.x, field.y),
-			removedFields = this._getFieldsByModels(field.model.takePawnOff());
+	Board.prototype.draggingStart = function(field) {		
+		var removedFields = this._getFieldsByModels(field.model.takePawnOff());
 
-		this._draggedHexagon = field.view;		
-		field.view = emptyHexagon;		
-		this._attachHandlers(field);
+		this._draggedField = field;
+		this._removeField(field);
+		this._createField(new FieldView(field.x, field.y, this, field.model));
 
 		removedFields.forEach(function(rfield) {
-			rfield.view.remove();
+			rfield.remove();
 		});		
-
-		this._layer.add(emptyHexagon);
-		this._layer.draw();
-		this._draggedHexagon.moveToTop();
+		
+		this._draggedField.moveToTop();
+		this._layer.draw();		
 	}
 
-	Board.prototype._handleHexagonDragEnd = function(field, mouseEvent) {		
-		this._draggedHexagon.remove();		
-		this._draggedHexagon = null;
+	Board.prototype.draggingEnd = function(field, mouseEvent) {
+		var draggedFieldReferer = this._getFieldByModel(this._draggedField.model);
+		this._draggedField.remove();
+		this._draggedField = null;
 		this._layer.draw();
 
-		var dropTarget = this._getFieldByView(
+		var dropTarget = this._getFieldByHexagon(
 			this._stage.getIntersection(this._stage.pointerPos)
 		);
 		if(dropTarget) {
-			this._handleHexagonClicked(dropTarget);			
+			this.putPawnOn(dropTarget);			
 		} else {
-			this._handleHexagonClicked(field)
+			this.putPawnOn(draggedFieldReferer);
 		}		
 		this._layer.draw();		
 	}
 
-	Board.prototype._handleHexagonClicked = function(field) {	
-		var hexagon = field.view,
-			model = field.model,
+	Board.prototype.putPawnOn = function(field) {	
+		var model = field.model,
 			neighbour,
 			newField,
 			currentPlayer = this._game.currentPlayer;
@@ -159,17 +136,15 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 		if(!model.pawn) {
 
 			model.placePawn(currentPlayer.pawn);
-			hexagon.fill(currentPlayer.color);
-			hexagon.draggable(true);
-			hexagon.dash([]);	
+			field.placePawn(currentPlayer.pawn);
 			console.log("placing pawn");
 
 			for(var i = 0; i < model.neighbours.length; i++) {
-				neighbour = model.neighbours[i];
+				neighbour = model.neighbours[i];				
 				if(!this._boardContainsFieldModel(neighbour)) {					
+					var pos = this._emptyFieldInNeighbourhood(field, i);
 					newField = this._createField(
-						this._createHexagonNextToForIndex(hexagon, i),
-						neighbour
+						new FieldView(pos[0], pos[1], this, neighbour)
 					);					
 				}
 			}
