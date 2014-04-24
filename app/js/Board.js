@@ -68,20 +68,12 @@ function(Kinetic, FieldModel, FieldView, fn) {
 	}
 
 	Board.prototype._getFieldByModel = function(model) {
-		return this._fields.filter(function(field) {
-			return field.model == model;
-		})[0];
+		return this._fields.find(fn.dot('model').eq(model));
 	}
 
 	Board.prototype._getFieldsByModels = function(models) {
 		return models.map(this._getFieldByModel.bind(this));
 	}
-
-	Board.prototype._boardContainsFieldModel = function(fieldModel) {
-		return this._fields.filter(function(field) {
-			return field.model == fieldModel;
-		}).length > 0;
-	}	
 
 	Board.prototype.draggingStart = function(field) {		
 		var removedFields = this._getFieldsByModels(field.model.takePawnOff());
@@ -127,7 +119,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 
 			for(var i = 0; i < model.neighbours.length; i++) {
 				neighbour = model.neighbours[i];				
-				if(!this._boardContainsFieldModel(neighbour)) {					
+				if(!this._getFieldByModel(neighbour)) {					
 					var pos = this._emptyFieldInNeighbourhood(field, i);
 					newField = this._addField(
 						new FieldView(pos[0], pos[1], this, neighbour)
