@@ -54,8 +54,10 @@ define(['kineticjs'], function(Kinetic) {
 		layer.add(this._hexagon);		
 	}
 
-	FieldView.prototype.placePawn = function(pawn) {
-		var hexagon = this._hexagon;
+	FieldView.prototype.update = function() {
+		var hexagon = this._hexagon,
+			pawn = this.model.pawn;
+			
 		hexagon.fill(pawn.owner.color);
 		hexagon.draggable(true);
 		hexagon.dash([]);	

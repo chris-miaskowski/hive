@@ -107,25 +107,21 @@ function(Kinetic, FieldModel, FieldView, fn) {
 
 	Board.prototype.putPawnOn = function(field) {	
 		var model = field.model,
-			neighbour,
-			newField,
-			currentPlayer = this._game.currentPlayer;
+			currentPlayer = this._game.currentPlayer,
+			pos;
 
 		if(!model.pawn) {
 
 			model.placePawn(currentPlayer.pawn);
-			field.placePawn(currentPlayer.pawn);
-			console.log("placing pawn");
+			field.update();
 
-			for(var i = 0; i < model.neighbours.length; i++) {
-				neighbour = model.neighbours[i];				
+			_.each(model.neighbours, function(neighbour, index) {
 				if(!this._getFieldByModel(neighbour)) {					
-					var pos = this._emptyFieldInNeighbourhood(field, i);
-					newField = this._addField(
-						new FieldView(pos[0], pos[1], this, neighbour)
-					);					
+					pos = this._emptyFieldInNeighbourhood(field, index);
+					this._addField(new FieldView(pos[0], pos[1], this, neighbour));					
 				}
-			}
+			}.bind(this));
+
 			this._game.changeTurn();
 		}				
 		
