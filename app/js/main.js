@@ -1,16 +1,20 @@
 requirejs.config({
 	baseUrl: 'app/js',
 	paths: {
-		'kineticjs': '../../bower_components/kineticjs/kinetic.min'
+		'kineticjs': '../../bower_components/kineticjs/kinetic.min',
+		'underscore': '../../bower_components/underscore/underscore'
 	},
 	shim: {
 		'kineticjs': {
 			exports: 'Kinetic'
+		},
+		'underscore': {
+			exports: 'underscore'
 		}
 	}
 });
 
-require(["Board"], function(Board) {	
+require(["Board", "ArrayMod"], function(Board, ArrayMod) {	
 
 	var playerA = { color: 'green' },
 		playerB = { color: 'red' },			

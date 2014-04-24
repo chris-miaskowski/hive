@@ -1,4 +1,5 @@
-define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, FieldView) {
+define(['kineticjs', 'FieldModel', 'FieldView', 'Functional'], 
+function(Kinetic, FieldModel, FieldView, fn) {
 
 	function Board(game) {
 		this._game = game;
@@ -28,13 +29,14 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 	Board.prototype._draggedField = null;
 
 	Board.prototype.init = function() {
-		this._createField(			
-			new FieldView(this._stage.getWidth()/2, this._stage.getHeight()/2, this, new FieldModel())
+		this._addField(			
+			new FieldView(this._stage.getWidth()/2, 
+				this._stage.getHeight()/2, this, new FieldModel())
 		);
 		this._layer.draw();
 	}
 
-	Board.prototype._createField = function(fieldView) {
+	Board.prototype._addField = function(fieldView) {
 		console.log('creating new field');	
 		this._fields.push(fieldView);
 		fieldView.addToLayer(this._layer);
@@ -65,12 +67,6 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 		return this._coordsWithOffset(fieldView, xFactor(index), yFactor(index));
 	}
 
-	Board.prototype._getFieldByHexagon = function(hex) {
-		return this._fields.filter(function(field) {
-			return field._hexagon == hex;
-		})[0];
-	}
-
 	Board.prototype._getFieldByModel = function(model) {
 		return this._fields.filter(function(field) {
 			return field.model == model;
@@ -92,7 +88,7 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 
 		this._draggedField = field;
 		this._fields.remove(field);
-		this._createField(new FieldView(field.x, field.y, this, field.model));
+		this._addField(new FieldView(field.x, field.y, this, field.model));
 
 		removedFields.forEach(function(rfield) {
 			rfield.remove();
@@ -107,10 +103,8 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 		this._draggedField.remove();
 		this._draggedField = null;
 		this._layer.draw();
-
-		var dropTarget = this._getFieldByHexagon(
-			this._stage.getIntersection(this._stage.pointerPos)
-		);
+		var hexagon = this._stage.getIntersection(this._stage.pointerPos);
+		var dropTarget = this._fields.find(fn.dot('_hexagon').eq(hexagon));
 		if(dropTarget) {
 			this.putPawnOn(dropTarget);			
 		} else {
@@ -135,7 +129,7 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 				neighbour = model.neighbours[i];				
 				if(!this._boardContainsFieldModel(neighbour)) {					
 					var pos = this._emptyFieldInNeighbourhood(field, i);
-					newField = this._createField(
+					newField = this._addField(
 						new FieldView(pos[0], pos[1], this, neighbour)
 					);					
 				}
