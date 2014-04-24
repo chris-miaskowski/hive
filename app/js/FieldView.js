@@ -18,15 +18,19 @@ define(['kineticjs'], function(Kinetic) {
 		this.x = x;
 		this.y = y;
 		this._board = board;
-		this._hexagon = emptyField(x, y);		
+		this._hexagon = emptyField(x, y);	
+		this._group = new Kinetic.Group({
+	    	draggable: true
+	    }); 	
+	    this._group.add(this._hexagon);
 		this._initialiseEvents();
 	}
 
 	FieldView.prototype._initialiseEvents = function() {
-		var hexagon = this._hexagon;
-		hexagon.on('click', this._handleHexagonClicked.bind(this));
-		hexagon.on('dragstart', this._handleHexagonDragStart.bind(this));
-		hexagon.on('dragend', this._handleHexagonDragEnd.bind(this));
+		var element = this._group;
+		this._hexagon.on('click', this._handleHexagonClicked.bind(this));
+		element.on('dragstart', this._handleHexagonDragStart.bind(this));
+		element.on('dragend', this._handleHexagonDragEnd.bind(this));
 	}
 
 	FieldView.prototype._handleHexagonClicked = function() {	
@@ -47,20 +51,22 @@ define(['kineticjs'], function(Kinetic) {
 	}
 
 	FieldView.prototype.remove = function() {
-		this._hexagon.remove();
+		this._group.remove();
 	}
 
 	FieldView.prototype.addToLayer = function(layer) {
-		layer.add(this._hexagon);		
+		layer.add(this._group);		
 	}
 
-	FieldView.prototype.update = function() {
-		var hexagon = this._hexagon,
-			pawn = this.model.pawn;
-			
+	FieldView.prototype.placePawn = function(pawn) {
+		var hexagon = this._hexagon;
+
+		this._group.draggable(true);
+
 		hexagon.fill(pawn.owner.color);
-		hexagon.draggable(true);
 		hexagon.dash([]);	
+
+		this._board._layer.draw();
 
 		var text = new Kinetic.Text({
 	        x: this.x,
@@ -70,11 +76,12 @@ define(['kineticjs'], function(Kinetic) {
 	        fontFamily: 'Calibri',
 	        fill: 'black'
 	    });
-	    this._board._layer.add(text);
+
+	    this._group.add(text);
 	}
 
 	FieldView.prototype.moveToTop = function() {
-		this._hexagon.moveToTop();
+		this._group.moveToTop();
 	}
 
 	return FieldView;

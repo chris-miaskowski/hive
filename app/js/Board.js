@@ -121,7 +121,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		if(!model.pawn) {
 
 			model.placePawn(currentPlayer.pawn);
-			field.update();
+			field.placePawn(currentPlayer.pawn);
 
 			_.each(model.neighbours, function(neighbour, index) {
 				if(!this._getFieldByModel(neighbour)) {					
