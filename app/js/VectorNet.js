@@ -16,17 +16,9 @@ define(function() {
 	}
 
 	VectorNet.prototype.removeByField = function(field) {
-		var index;
-		for(var i = 0; i < this._vectorNet.length; i++) {
-			if(this._vectorNet[i].field == field) {
-				index = i;
-				break;
-			}
-		}
-
-		if(index !== undefined) {
-			this._vectorNet.splice(index, 1);
-		}
+		this._vectorNet.remove(function(vector) {
+			return vector.field == field;
+		});		
 	}
 
 	VectorNet.prototype._getVectorForIndex = function(index) {

@@ -65,14 +65,6 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 		return this._coordsWithOffset(fieldView, xFactor(index), yFactor(index));
 	}
 
-	Board.prototype._getFieldByView = function(fieldView) {
-		return this._fields[this._fields.indexOf(fieldView)];
-	}
-
-	Board.prototype._removeField = function(field) {
-		this._fields.splice(this._fields.indexOf(field), 1);
-	}
-
 	Board.prototype._getFieldByHexagon = function(hex) {
 		return this._fields.filter(function(field) {
 			return field._hexagon == hex;
@@ -99,7 +91,7 @@ define(['kineticjs', 'FieldModel', 'FieldView'], function(Kinetic, FieldModel, F
 		var removedFields = this._getFieldsByModels(field.model.takePawnOff());
 
 		this._draggedField = field;
-		this._removeField(field);
+		this._fields.remove(field);
 		this._createField(new FieldView(field.x, field.y, this, field.model));
 
 		removedFields.forEach(function(rfield) {
