@@ -1,10 +1,12 @@
 define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 
-	function Board() {
+	function Board(game) {
+		this._game = game;
+
 		this._stage = new Kinetic.Stage({
 			container: 'boardContainer',
-			width: 578,
-			height: 500
+			width: 800,
+			height: 800
 		});
 
 		this._layer = new Kinetic.Layer();
@@ -13,6 +15,8 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 
 		this._structure = [];
 	}	
+
+	Board.prototype._game = null;
 
 	Board.prototype._stage = null;
 
@@ -149,12 +153,13 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 		var hexagon = field.view,
 			model = field.model,
 			neighbour,
-			newField;
+			newField,
+			currentPlayer = this._game.currentPlayer;
 
 		if(!model.pawn) {
 
-			model.placePawn("pawn");
-			hexagon.fill('green');
+			model.placePawn(currentPlayer.pawn);
+			hexagon.fill(currentPlayer.color);
 			hexagon.draggable(true);
 			hexagon.dash([]);	
 			console.log("placing pawn");
@@ -168,6 +173,7 @@ define(['kineticjs', 'FieldModel'], function(Kinetic, FieldModel) {
 					);					
 				}
 			}
+			this._game.changeTurn();
 		}				
 		
 		this._layer.draw();

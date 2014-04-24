@@ -12,6 +12,22 @@ requirejs.config({
 
 require(["Board"], function(Board) {	
 
-	new Board().init();
+	var playerA = { color: 'green' },
+		playerB = { color: 'red' },			
+		players = [playerA, playerB];
+
+	playerA.pawn = { owner: playerA };
+	playerB.pawn = { owner: playerB };
+
+	var game = {
+		currentPlayer: players[0],
+		changeTurn: function() {			
+			game.currentPlayer = players[(players.indexOf(game.currentPlayer)+1)%2];
+		}
+	};
+
+	var board = new Board(game);
+
+	board.init();
 
 });
