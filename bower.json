@@ -13,6 +13,7 @@
   ],
   "dependencies": {
     "requirejs": "~2.1.11",
-    "kineticjs": "~5.0.1"
+    "kineticjs": "~5.0.1",
+    "underscore": "~1.6.0"
   }
 }
