@@ -1,20 +1,13 @@
 define(['kineticjs', 'FieldModel', 'FieldView', 'Functional'], 
 function(Kinetic, FieldModel, FieldView, fn) {
 
-	function Board(game) {
+	function Board(game, stage) {
 		this._game = game;
-
-		this._stage = new Kinetic.Stage({
-			container: 'boardContainer',
-			width: 800,
-			height: 800,
+		this._stage = stage;
+		this._layer = new Kinetic.Layer({
 			draggable: true
 		});
-
-		this._layer = new Kinetic.Layer();
-
 		this._stage.add(this._layer);
-
 		this._fields = [];
 	}	
 
@@ -71,7 +64,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		return this._fields.find(fn.dot('model').eq(model));
 	}
 
-	Board.prototype.draggingStart = function(field) {		
+	Board.prototype.draggingStart = function(field) {
 		var removedFields = field.model.takePawnOff()
 				.map(this._getFieldByModel.bind(this));
 
@@ -104,13 +97,24 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		hexagon = this._stage.getIntersection(this._stage.pointerPos);
 		dropTargetField = this._fields.find(fn.dot('_hexagon').eq(hexagon));
 		
-		if(dropTargetField) {
+		if(dropTargetField && !dropTargetField.model.pawn) {
 			this.putPawnOn(dropTargetField);			
 		} else {
 			this.putPawnOn(originalField);
 		}		
 
 		this._layer.draw();		
+	}
+
+	Board.prototype._updateBoard = function() {
+		var cp = this._game.currentPlayer;
+		this._fields.forEach(function(field) {
+			if(field.model.pawn && field.model.pawn.owner == cp) {
+				field.toggleDraggable(true);
+			} else {
+				field.toggleDraggable(false);
+			}
+		});
 	}
 
 	Board.prototype.putPawnOn = function(field) {	
@@ -131,9 +135,11 @@ function(Kinetic, FieldModel, FieldView, fn) {
 			}.bind(this));
 
 			this._game.changeTurn();
+			this._updateBoard();
+
+			this._layer.draw();
 		}				
-		
-		this._layer.draw();
+			
 	}		
 
 	return Board;

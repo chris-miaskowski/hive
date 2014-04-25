@@ -19,9 +19,7 @@ define(['kineticjs'], function(Kinetic) {
 		this.y = y;
 		this._board = board;
 		this._hexagon = emptyField(x, y);	
-		this._group = new Kinetic.Group({
-	    	draggable: true
-	    }); 	
+		this._group = new Kinetic.Group({}); 	
 	    this._group.add(this._hexagon);
 		this._initialiseEvents();
 	}
@@ -37,7 +35,7 @@ define(['kineticjs'], function(Kinetic) {
 		this._board.putPawnOn(this);
 	}		
 
-	FieldView.prototype._handleHexagonDragStart = function() {		
+	FieldView.prototype._handleHexagonDragStart = function() {
 		this._board.draggingStart(this);		
 	}
 
@@ -61,8 +59,6 @@ define(['kineticjs'], function(Kinetic) {
 	FieldView.prototype.placePawn = function(pawn) {
 		var hexagon = this._hexagon;
 
-		this._group.draggable(true);
-
 		hexagon.fill(pawn.owner.color);
 		hexagon.dash([]);	
 
@@ -78,6 +74,10 @@ define(['kineticjs'], function(Kinetic) {
 	    });
 
 	    this._group.add(text);
+	}
+
+	FieldView.prototype.toggleDraggable = function(toggleValue) {
+		this._group.draggable(toggleValue);
 	}
 
 	FieldView.prototype.moveToTop = function() {
