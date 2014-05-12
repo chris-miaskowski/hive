@@ -2,11 +2,56 @@
 <html>
 <head>
 	<meta charset='utf-8' />
+	<style>
+		.flex {
+			display: -webkit-flex;
+			display: flex;
+		}
+
+		.row {			
+			-webkit-flex-direction: row;
+		}
+
+		.column {
+			-webkit-flex-direction: column;
+		}
+
+		#boardContainer {
+			border: solid 1px black; 
+			width: 800px; 
+			height: 800px;
+		}
+
+		.guiContainer {
+			background: #EEC58A;
+			width: 300px;
+		}
+
+		.playerName {
+			text-align: center;
+		}
+	</style>
 </head>
 <body>
-
-	<div style="border: solid 1px black; width: 800px; height: 800px" id="boardContainer"></div>
-
+	<div class="workspace flex row">
+		<div id="boardContainer" class="flex column"></div>
+		<div class="guiContainer" class="flex column">
+			<h3 class="playerName"></h3>
+			<div class="pawnsContainer">
+				<div class="holdedPawnName"></div>
+				<div class="availablePawns">
+					<select name="pawns" id="pawnsSelect">
+						<option value="Ant">Ant</option>
+						<option value="Spider">Spider</option>
+						<option value="Grasshopper">Grasshopper</option>
+						<option value="Beetle">Beetle</option>
+						<option value="Bee">Bee</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<script data-main='app/js/main' src='bower_components/requirejs/require.js'></script>
 </body>
 </html>

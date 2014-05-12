@@ -2,7 +2,8 @@ requirejs.config({
 	baseUrl: 'app/js',
 	paths: {
 		'kineticjs': '../../bower_components/kineticjs/kinetic.min',
-		'underscore': '../../bower_components/underscore/underscore'
+		'underscore': '../../bower_components/underscore/underscore',
+		'jquery': '../../bower_components/jquery/dist/jquery'
 	},
 	shim: {
 		'kineticjs': {
@@ -10,6 +11,9 @@ requirejs.config({
 		},
 		'underscore': {
 			exports: 'underscore'
+		},
+		'jquery': {
+			exports: 'jquery'
 		}
 	}
 });
@@ -25,14 +29,14 @@ function renderText(x, y, text, color) {
     });
 }
 
-require(["Board", "ArrayMod", 'kineticjs'], function(Board, ArrayMod, Kinetic) {	
+require(["Board", "ArrayMod", 'kineticjs', 'jquery'], function(Board, ArrayMod, Kinetic, $) {	
 
 	var playerA = { color: 'green', name: 'player a' },
 		playerB = { color: 'red', name: 'player b' },			
-		players = [playerA, playerB];
+		players = [ playerA, playerB ];
 
-	playerA.pawn = { owner: playerA, type: 'A' };
-	playerB.pawn = { owner: playerB, type: 'A' };
+	playerA.pawn = { owner: playerA, type: 'Ant' };
+	playerB.pawn = { owner: playerB, type: 'Ant' };
 
 	var stage = new Kinetic.Stage({
 		container: 'boardContainer',
@@ -42,35 +46,38 @@ require(["Board", "ArrayMod", 'kineticjs'], function(Board, ArrayMod, Kinetic) {
 
 	
 	function Gui(game, stage) {
-		this._currentPlayerText = renderText(0, 0, 
-			'Current player: ', 'white');
 		this._game = game;
-		this._layer = new Kinetic.Layer();
-		this._layer.add(this._currentPlayerText);
-		stage.add(this._layer);
+		this._currentPlayerText = $('.playerName');
 		this.update();
-	}	
+		this.initialiseEvents();
+	};	
 
 	Gui.prototype.update = function() {
-		this._currentPlayerText.text(this._game.currentPlayer.name);
-		this._currentPlayerText.fill(this._game.currentPlayer.color);
-		this._layer.draw();
-	}
+		this._currentPlayerText.html(this._game.currentPlayer.name);		
+	};
+
+	Gui.prototype.initialiseEvents = function() {
+		jQuery('#pawnsSelect').on('change', function(jEvent) {
+			var selectedPawn = $(jEvent.target).val();
+			this._game.currentPlayer.pawn.type = selectedPawn;
+		}.bind(this));
+	};
 
 	var game = {
 		currentPlayer: players[0],
+
 		changeTurn: function() {			
 			game.currentPlayer = players[(players.indexOf(game.currentPlayer)+1)%2];
 			this._gui.update();
 		},
+
 		setGui: function(gui) {
 			this._gui = gui;
 		}
 	};	
 
 	var gui = new Gui(game, stage);
-	game.setGui(gui);
-	game.changeTurn();
+	game.setGui(gui);	
 
 	var board = new Board(game, stage);
 

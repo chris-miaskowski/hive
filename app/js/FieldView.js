@@ -65,11 +65,11 @@ define(['kineticjs'], function(Kinetic) {
 		this._board._layer.draw();
 
 		var text = new Kinetic.Text({
-	        x: this.x,
+	        x: this.x-12,
 	        y: this.y,
-	        text: pawn.type,
-	        fontSize: 30,
-	        fontFamily: 'Calibri',
+	        text: pawn.type.slice(0,4),
+	        fontSize: 15,
+	        fontFamily: 'Courier New',
 	        fill: 'black'
 	    });
 
