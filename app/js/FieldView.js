@@ -70,7 +70,7 @@ define(['kineticjs'], function(Kinetic) {
 	        text: pawn.type.slice(0,4),
 	        fontSize: 15,
 	        fontFamily: 'Courier New',
-	        fill: 'black'
+	        fill: pawn.color
 	    });
 
 	    this._group.add(text);

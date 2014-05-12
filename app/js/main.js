@@ -32,8 +32,8 @@ function renderText(x, y, text, color) {
 require(["Board", "ArrayMod", 'kineticjs', 'jquery', 'Player', 'Gui'], 
 function(Board, ArrayMod, Kinetic, $, Player, Gui) {	
 
-	var playerA = new Player('Player A', 'blue'),
-		playerB = new Player('Player B', 'red'),
+	var playerA = new Player('Player A', '#D6C0B9'),
+		playerB = new Player('Player B', '#36302E'),
 		players = [ playerA, playerB ];
 
 	var stage = new Kinetic.Stage({

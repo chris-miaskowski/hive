@@ -4,11 +4,11 @@ define(['Functional'], function(fn) {
 		this.name = name;
 		this.color = color;		
 		this.pawns = [
-			{ type: "Ant", quantity: 3 },
-			{ type: "Spider", quantity: 3 },
-			{ type: "Beetle", quantity: 2 },
-			{ type: "Grasshopper", quantity: 2 },
-			{ type: "Bee", quantity: 1 }
+			{ type: "Ant", quantity: 3, color: '#5A8C87' },
+			{ type: "Spider", quantity: 3, color: 'red' },
+			{ type: "Beetle", quantity: 2, color: 'white' },
+			{ type: "Grasshopper", quantity: 2, color: 'green' },
+			{ type: "Bee", quantity: 1, color: 'yellow' }
 		];
 
 		this.pawns.forEach(function(pawn) {
