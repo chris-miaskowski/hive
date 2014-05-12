@@ -6,7 +6,12 @@ define(function() {
 					return function(item) {
 						return item[prop] == val;
 					}					
-				}			
+				},
+				gt: function(val) {
+					return function(item) {
+						return item[prop] > val;
+					}					
+				}
 			}
 		}
 	};

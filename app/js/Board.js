@@ -65,6 +65,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 	}
 
 	Board.prototype.draggingStart = function(field) {
+		this._draggedPawn = field.model.pawn;
 		var removedFields = field.model.takePawnOff()
 				.map(this._getFieldByModel.bind(this));
 
@@ -98,9 +99,9 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		dropTargetField = this._fields.find(fn.dot('_hexagon').eq(hexagon));
 		
 		if(dropTargetField && !dropTargetField.model.pawn) {
-			this.putPawnOn(dropTargetField);			
+			this.putPawnOn(dropTargetField, this._draggedPawn);			
 		} else {
-			this.putPawnOn(originalField);
+			this.putPawnOn(originalField, this._draggedPawn);
 		}		
 
 		this._layer.draw();		
@@ -117,15 +118,19 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		});
 	}
 
-	Board.prototype.putPawnOn = function(field) {	
+	Board.prototype.fieldClicked = function(field) {
+		var player = this._game.currentPlayer;		
+		this.putPawnOn(field, player.releasePawn());
+	};
+
+	Board.prototype.putPawnOn = function(field, pawn) {	
 		var model = field.model,
-			currentPlayer = this._game.currentPlayer,
 			pos;
 
 		if(!model.pawn) {
 
-			model.placePawn(currentPlayer.pawn);
-			field.placePawn(currentPlayer.pawn);
+			model.placePawn(pawn);
+			field.placePawn(pawn);
 
 			_.each(model.neighbours, function(neighbour, index) {
 				if(!this._getFieldByModel(neighbour)) {					

@@ -31,8 +31,8 @@ define(['kineticjs'], function(Kinetic) {
 		element.on('dragend', this._handleHexagonDragEnd.bind(this));
 	}
 
-	FieldView.prototype._handleHexagonClicked = function() {	
-		this._board.putPawnOn(this);
+	FieldView.prototype._handleHexagonClicked = function() {		
+		this._board.fieldClicked(this);
 	}		
 
 	FieldView.prototype._handleHexagonDragStart = function() {

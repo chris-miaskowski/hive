@@ -29,39 +29,18 @@ function renderText(x, y, text, color) {
     });
 }
 
-require(["Board", "ArrayMod", 'kineticjs', 'jquery'], function(Board, ArrayMod, Kinetic, $) {	
+require(["Board", "ArrayMod", 'kineticjs', 'jquery', 'Player', 'Gui'], 
+function(Board, ArrayMod, Kinetic, $, Player, Gui) {	
 
-	var playerA = { color: 'green', name: 'player a' },
-		playerB = { color: 'red', name: 'player b' },			
+	var playerA = new Player('Player A', 'blue'),
+		playerB = new Player('Player B', 'red'),
 		players = [ playerA, playerB ];
-
-	playerA.pawn = { owner: playerA, type: 'Ant' };
-	playerB.pawn = { owner: playerB, type: 'Ant' };
 
 	var stage = new Kinetic.Stage({
 		container: 'boardContainer',
 		width: 800,
 		height: 800
-	});
-
-	
-	function Gui(game, stage) {
-		this._game = game;
-		this._currentPlayerText = $('.playerName');
-		this.update();
-		this.initialiseEvents();
-	};	
-
-	Gui.prototype.update = function() {
-		this._currentPlayerText.html(this._game.currentPlayer.name);		
-	};
-
-	Gui.prototype.initialiseEvents = function() {
-		jQuery('#pawnsSelect').on('change', function(jEvent) {
-			var selectedPawn = $(jEvent.target).val();
-			this._game.currentPlayer.pawn.type = selectedPawn;
-		}.bind(this));
-	};
+	});		
 
 	var game = {
 		currentPlayer: players[0],
