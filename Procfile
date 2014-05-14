@@ -1,1 +1,1 @@
-web: node middleware/web.js
+web: node web.js
