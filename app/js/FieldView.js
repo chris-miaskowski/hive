@@ -13,12 +13,11 @@ define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 	      });
 	}
 
-	var FieldView = function (x, y, board, model) {	
+	var FieldView = function (x, y, model) {	
 		Subscribable.prototype.constructor.call(this);
 		this.model = model;
 		this.x = x;
 		this.y = y;
-		this._board = board;
 		this._hexagon = emptyField(x, y);	
 		this._group = new Kinetic.Group({}); 	
 	    this._group.add(this._hexagon);
@@ -28,22 +27,12 @@ define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 	FieldView.prototype = Object.create(Subscribable.prototype);
 
 	FieldView.prototype._initialiseEvents = function() {
-		var element = this._group;
-		this._hexagon.on('click', this._handleHexagonClicked.bind(this));
-		element.on('dragstart', this._handleHexagonDragStart.bind(this));
-		element.on('dragend', this._handleHexagonDragEnd.bind(this));
-	}
+		var element = this._group,
+			eventData = { source: this };
 
-	FieldView.prototype._handleHexagonClicked = function() {		
-		this.fire('clicked', { source: this });
-	}		
-
-	FieldView.prototype._handleHexagonDragStart = function() {
-		this._board.draggingStart(this);		
-	}
-
-	FieldView.prototype._handleHexagonDragEnd = function(mouseEvent) {
-		this._board.draggingEnd(this, mouseEvent);
+		element.on('click', this.fire.bind(this, 'clicked', eventData));
+		element.on('dragstart', this.fire.bind(this, 'dragstart', eventData));
+		element.on('dragend', this.fire.bind(this, 'dragend', eventData));
 	}
 
 	FieldView.prototype.empty = function() {
@@ -60,14 +49,13 @@ define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 	}
 
 	FieldView.prototype.placePawn = function(pawn) {
-		var hexagon = this._hexagon;
+		var hexagon = this._hexagon,
+			text;
 
 		hexagon.fill(pawn.owner.color);
-		hexagon.dash([]);	
+		hexagon.dash([]);			
 
-		this._board._layer.draw();
-
-		var text = new Kinetic.Text({
+		text = new Kinetic.Text({
 	        x: this.x-12,
 	        y: this.y,
 	        text: pawn.type.slice(0,4),

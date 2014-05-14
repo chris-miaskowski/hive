@@ -26,18 +26,26 @@ function(Kinetic, FieldModel, FieldView, fn) {
 			this._createField(
 				this._stage.getWidth()/2,
 				this._stage.getHeight()/2,
-				this,
 				new FieldModel()
 			)
 		);
 		this._layer.draw();
 	}
 
-	Board.prototype._createField = function(width, height, board, model) {
-		var fieldView = new FieldView(width, height, board, model);
-		fieldView.on('clicked', function(eventData) {
-			this.fieldClicked(eventData.source);
-		}, this);
+	Board.prototype._createField = function(width, height, model) {
+		var fieldView = new FieldView(width, height, model),
+			that = this;
+
+		function registerListener(eventName, callback) {
+			fieldView.on(eventName, function(eventData) {
+				this[callback](eventData.source);
+			}, that);
+		}
+
+		registerListener('clicked', 'fieldClicked');
+		registerListener('dragend', 'draggingEnd');
+		registerListener('dragstart', 'draggingStart');
+
 		return fieldView;
 	};
 
@@ -85,7 +93,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 		// remove dragged field from the boards but leave it on screen
 		this._fields.remove(field);
 		// add new, empty, field in place of the dragged one
-		this._addField(this._createField(field.x, field.y, this, field.model));
+		this._addField(this._createField(field.x, field.y, field.model));
 
 		// remove all unnecessary fields left after taking pawn off
 		removedFields.forEach(function(rfield) {
@@ -147,7 +155,7 @@ function(Kinetic, FieldModel, FieldView, fn) {
 			_.each(model.neighbours, function(neighbour, index) {
 				if(!this._getFieldByModel(neighbour)) {					
 					pos = this._emptyFieldInNeighbourhood(field, index);
-					this._addField(this._createField(pos[0], pos[1], this, neighbour));					
+					this._addField(this._createField(pos[0], pos[1], neighbour));					
 				}
 			}.bind(this));
 
