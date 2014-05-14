@@ -3,7 +3,8 @@ requirejs.config({
 	paths: {
 		'kineticjs': '../../bower_components/kineticjs/kinetic.min',
 		'underscore': '../../bower_components/underscore/underscore',
-		'jquery': '../../bower_components/jquery/dist/jquery'
+		'jquery': '../../bower_components/jquery/dist/jquery',
+		'rsvp': '../../bower_components/rsvp/rsvp.amd'
 	},
 	shim: {
 		'kineticjs': {
@@ -29,37 +30,6 @@ function renderText(x, y, text, color) {
     });
 }
 
-require(["Board", "ArrayMod", 'kineticjs', 'jquery', 'Player', 'Gui'], 
-function(Board, ArrayMod, Kinetic, $, Player, Gui) {	
-
-	var playerA = new Player('Player A', '#D6C0B9'),
-		playerB = new Player('Player B', '#36302E'),
-		players = [ playerA, playerB ];
-
-	var stage = new Kinetic.Stage({
-		container: 'boardContainer',
-		width: 800,
-		height: 800
-	});		
-
-	var game = {
-		currentPlayer: players[0],
-
-		changeTurn: function() {			
-			game.currentPlayer = players[(players.indexOf(game.currentPlayer)+1)%2];
-			this._gui.update();
-		},
-
-		setGui: function(gui) {
-			this._gui = gui;
-		}
-	};	
-
-	var gui = new Gui(game, stage);
-	game.setGui(gui);	
-
-	var board = new Board(game, stage);
-
-	board.init();
-
+require(['Game'], function(Game) {	
+	new Game().start();
 });

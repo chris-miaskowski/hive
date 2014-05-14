@@ -14,9 +14,8 @@
   "dependencies": {
     "requirejs": "~2.1.11",
     "kineticjs": "~5.0.1",
-    "underscore": "~1.6.0"
-  },
-  "devDependencies": {
-    "jquery": "~2.1.1"
+    "underscore": "~1.6.0",
+    "jquery": "~2.1.1",
+    "rsvp": "~3.0.6"
   }
 }
