@@ -1,6 +1,7 @@
 {
   "name": "hive",
   "version": "0.0.0",
+  "private": true,
   "description": "",
   "main": "middleware/web.js",
   "directories": {
