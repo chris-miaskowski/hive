@@ -1,0 +1,22 @@
+{
+  "name": "hive",
+  "version": "0.0.0",
+  "description": "",
+  "main": "middleware/web.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:krzysiekswf/hive.git"
+  },
+  "author": "Krzysztof Miaskowski",
+  "license": "ISC",
+  "dependencies": {
+    "logfmt": "~1.1.2",
+    "express": "~4.2.0"
+  }
+}

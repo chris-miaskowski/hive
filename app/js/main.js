@@ -19,17 +19,6 @@ requirejs.config({
 	}
 });
 
-function renderText(x, y, text, color) {
-	return new Kinetic.Text({
-        x: x,
-        y: y,
-        text: text,
-        fontSize: 24,
-        fontFamily: 'Calibri',
-        fill: color
-    });
-}
-
 require(['Game', 'ResourceLoader'], function(Game, ResourceLoader) {	
 	new ResourceLoader().loadResources().then(function(resourceLibrary) {
 		window.ResourceLibrary = resourceLibrary;
