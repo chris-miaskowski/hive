@@ -30,6 +30,9 @@ function renderText(x, y, text, color) {
     });
 }
 
-require(['Game'], function(Game) {	
-	new Game().start();
+require(['Game', 'ResourceLoader'], function(Game, ResourceLoader) {	
+	new ResourceLoader().loadResources().then(function(resourceLibrary) {
+		window.ResourceLibrary = resourceLibrary;
+		new Game().start();
+	});	
 });

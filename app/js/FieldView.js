@@ -13,6 +13,17 @@ define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 	      });
 	}
 
+	function createKineticImage(image, x, y, width, height) {
+		var kimage = new Kinetic.Image({
+			image: image,
+			x: x,
+			y: y,
+			width: width,
+			height: height
+		});				
+		return kimage;
+	}	
+
 	var FieldView = function (x, y, model) {	
 		Subscribable.prototype.constructor.call(this);
 		this.model = model;
@@ -50,21 +61,19 @@ define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 
 	FieldView.prototype.placePawn = function(pawn) {
 		var hexagon = this._hexagon,
-			text;
+			image;
 
 		hexagon.fill(pawn.owner.color);
 		hexagon.dash([]);			
 
-		text = new Kinetic.Text({
-	        x: this.x-12,
-	        y: this.y,
-	        text: pawn.type.slice(0,4),
-	        fontSize: 15,
-	        fontFamily: 'Courier New',
-	        fill: pawn.color
-	    });
+		image = createKineticImage(
+			ResourceLibrary[pawn.type.toLowerCase()], 
+			this.x - hexagon.radius()/2, 
+			this.y - hexagon.radius()/2,
+			40,
+			40);
 
-	    this._group.add(text);
+	    this._group.add(image);
 	}
 
 	FieldView.prototype.toggleDraggable = function(toggleValue) {

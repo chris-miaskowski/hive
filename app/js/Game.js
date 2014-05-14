@@ -1,8 +1,8 @@
-define(["Board", "ArrayMod", 'kineticjs', 'jquery', 'Player', 'Gui', 'ResourceLoader'], 
-function(Board, ArrayMod, Kinetic, $, Player, Gui, ResourceLoader) {
+define(["Board", "ArrayMod", 'kineticjs', 'jquery', 'Player', 'Gui'], 
+function(Board, ArrayMod, Kinetic, $, Player, Gui) {
 
-	var playerA = new Player('Player A', '#D6C0B9'),
-		playerB = new Player('Player B', '#36302E'),
+	var playerA = new Player('Player A', '#eee'),
+		playerB = new Player('Player B', '#555'),
 		players = [ playerA, playerB ];
 
 	function Game() {
@@ -15,11 +15,6 @@ function(Board, ArrayMod, Kinetic, $, Player, Gui, ResourceLoader) {
 			container: 'boardContainer',
 			width: 800,
 			height: 800
-		});	
-
-		var resourceLoader = new ResourceLoader();
-		resourceLoader.loadResources().then(function(library) {
-			
 		});
 
 		var gui = new Gui(this, stage);

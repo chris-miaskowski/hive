@@ -28,17 +28,6 @@ define(['rsvp'], function(Rsvp) {
 			image.src = url;
 		});
 		return promise;
-	}
-
-	function createKineticImage(image, x, y, width, height) {
-		var kimage = new Kinetic.Image({
-			image: this,
-			x: 0,
-			y: 0,
-			width: 40,
-			height: 40
-		});				
-		return kimage;
 	}	
 
 	return ResourceLoader;
