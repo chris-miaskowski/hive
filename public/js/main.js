@@ -1,10 +1,10 @@
 requirejs.config({
 	baseUrl: 'js',
 	paths: {
-		'kineticjs': '../../bower_components/kineticjs/kinetic.min',
-		'underscore': '../../bower_components/underscore/underscore',
-		'jquery': '../../bower_components/jquery/dist/jquery',
-		'rsvp': '../../bower_components/rsvp/rsvp.amd'
+		'kineticjs': '../bower_components/kineticjs/kinetic.min',
+		'underscore': '../bower_components/underscore/underscore',
+		'jquery': '../bower_components/jquery/dist/jquery',
+		'rsvp': '../bower_components/rsvp/rsvp.amd'
 	},
 	shim: {
 		'kineticjs': {
