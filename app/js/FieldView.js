@@ -1,4 +1,4 @@
-define(['kineticjs'], function(Kinetic) {
+define(['kineticjs', 'Subscribable'], function(Kinetic, Subscribable) {
 
 	function emptyField(x, y) {
 		return new Kinetic.RegularPolygon({
@@ -14,6 +14,7 @@ define(['kineticjs'], function(Kinetic) {
 	}
 
 	var FieldView = function (x, y, board, model) {	
+		Subscribable.prototype.constructor.call(this);
 		this.model = model;
 		this.x = x;
 		this.y = y;
@@ -24,6 +25,8 @@ define(['kineticjs'], function(Kinetic) {
 		this._initialiseEvents();
 	}
 
+	FieldView.prototype = Object.create(Subscribable.prototype);
+
 	FieldView.prototype._initialiseEvents = function() {
 		var element = this._group;
 		this._hexagon.on('click', this._handleHexagonClicked.bind(this));
@@ -32,7 +35,7 @@ define(['kineticjs'], function(Kinetic) {
 	}
 
 	FieldView.prototype._handleHexagonClicked = function() {		
-		this._board.fieldClicked(this);
+		this.fire('clicked', { source: this });
 	}		
 
 	FieldView.prototype._handleHexagonDragStart = function() {
