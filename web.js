@@ -25,7 +25,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', function(req, res){
-  res.redirect('/index.html');
+  res.send('Hello');
 });
 
 http.createServer(app).listen(app.get('port'), function(){
