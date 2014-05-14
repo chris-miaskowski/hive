@@ -1,5 +1,5 @@
 requirejs.config({
-	baseUrl: 'app/js',
+	baseUrl: 'js',
 	paths: {
 		'kineticjs': '../../bower_components/kineticjs/kinetic.min',
 		'underscore': '../../bower_components/underscore/underscore',

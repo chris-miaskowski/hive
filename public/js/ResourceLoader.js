@@ -7,7 +7,7 @@ define(['rsvp'], function(Rsvp) {
 	ResourceLoader.prototype.loadResources = function() {
 		var imageNames = ['ant', 'spider', 'bee', 'beetle', 'grasshopper'],
 			imagePromises = imageNames.map(function(fileName) {
-				return promiseImage('app/img/{0}.png'.replace('{0}', fileName), fileName);
+				return promiseImage('img/{0}.png'.replace('{0}', fileName), fileName);
 			});
 
 		return Rsvp.all(imagePromises).then(function(images) {
